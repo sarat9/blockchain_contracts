@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>✈️ Boeing Supply Chain Portal</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      background: #f5f8fa;
+    }
+
+    h2 {
+      color: #004f9e;
+    }
+
+    p {
+      color: #444;
+    }
+
+    .card {
+      background: white;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      border-left: 5px solid #0072c6;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: #0072c6;
+    }
+
+    button {
+      padding: 8px 14px;
+      margin: 6px 5px 10px 0;
+      font-size: 14px;
+      border-radius: 4px;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    .owner button {
+      background-color: #004f9e;
+    }
+
+    .manufacturer button {
+      background-color: #008751;
+    }
+
+    .lab button {
+      background-color: #c37800;
+    }
+
+    .installer button {
+      background-color: #7b1fa2;
+    }
+
+    .history-btn {
+      background-color: #666 !important;
+    }
+
+    pre {
+      background: #eef1f5;
+      padding: 1rem;
+      border-radius: 6px;
+      font-size: 13px;
+      white-space: pre-wrap;
+      border: 1px solid #ddd;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+
+<h2>✈️ Boeing Supply Chain Demo</h2>
+<p>Click the steps in order to simulate the supply chain process on blockchain.</p>
+
+<div id="container"></div>
+
+<script>
+  const users = [
+    {
+      name: "Boeing",
+      role: "owner",
+      wallet: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      privateKey: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    },
+    {
+      name: "WingsMan",
+      role: "manufacturer",
+      wallet: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      privateKey: "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"
+    },
+    {
+      name: "DQ Labs",
+      role: "lab",
+      wallet: "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+      privateKey: "0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba"
+    },
+    {
+      name: "AirInstallers",
+      role: "installer",
+      wallet: "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955",
+      privateKey: "0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356"
+    }
+  ];
+
+  let currentComponentId = 0;
+  const container = document.getElementById("container");
+
+  users.forEach(user => {
+    const card = document.createElement("div");
+    card.className = `card ${user.role}`;
+
+    const actions = [];
+
+    if (user.role === "owner") {
+      actions.push({ label: "Order Component", action: "order" });
+      actions.push({ label: "Assign Lab", action: "assign-lab" });
+      actions.push({ label: "Mark Delivered", action: "mark-delivered" });
+    } else if (user.role === "manufacturer") {
+      actions.push({ label: "Create Component", action: "create" });
+      actions.push({ label: "Assign Lab", action: "assign-lab" });
+      actions.push({ label: "Add Test Report", action: "test" });
+      actions.push({ label: "Approve Component", action: "approve" });
+      actions.push({ label: "Mark Ready for Delivery", action: "mark-ready" });
+    } else if (user.role === "lab") {
+      actions.push({ label: "Add Test Report", action: "test" });
+      actions.push({ label: "Approve Component", action: "approve" });
+    } else if (user.role === "installer") {
+      actions.push({ label: "Install Component", action: "install" });
+      actions.push({ label: "Approve Component", action: "approve" });
+    }
+
+    card.innerHTML = `
+      <h3>${user.name} (${user.role})</h3>
+      <p><strong>Wallet:</strong> ${user.wallet}</p>
+      ${actions.map(a => `<button onclick='callAction("${a.action}", ${JSON.stringify(user)})'>${a.label}</button>`).join("")}
+      <button class="history-btn" onclick='viewHistory(${JSON.stringify(user)})'>📜 View History</button>
+      <pre id="result-${user.wallet}">Waiting...</pre>
+    `;
+
+    container.appendChild(card);
+  });
+
+  async function callAction(action, user) {
+    const body = {
+      wallet: user.wallet,
+      privateKey: user.privateKey,
+      componentId: currentComponentId,
+      partName: "Wing A",
+      reportHash: "QmTestDemo",
+      manufacturer: users.find(u => u.role === "manufacturer").wallet,
+      lab: users.find(u => u.role === "lab").wallet
+    };
+
+    if (action === "order") delete body.reportHash;
+
+    if (action === "create") {
+      body.componentId = currentComponentId;
+      body.lab = users.find(u => u.role === "lab").wallet;
+    }
+
+    const url = `http://localhost:4000/api/aero/${action}`;
+    const output = document.getElementById(`result-${user.wallet}`);
+
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+
+      if (data.componentId) currentComponentId = data.componentId;
+      output.textContent = JSON.stringify(data, null, 2);
+    } catch (err) {
+      output.textContent = "❌ Error: " + err.message;
+    }
+  }
+
+  async function viewHistory(user) {
+    if (currentComponentId === null) {
+      alert("❗ Please create a component first");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:4000/api/users/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ privateKey: user.privateKey, componentId: currentComponentId })
+      });
+
+      const result = await response.json();
+      const output = document.getElementById(`result-${user.wallet}`);
+
+      if (result.history) {
+        const formatted = result.history.map(h =>
+          `🔹 ${h.status}\n👤 ${h.updatedBy}\n🕒 ${h.timestamp}`
+        ).join("\n\n");
+        output.textContent = `📦 History for Component #${result.componentId}\n\n${formatted}`;
+      } else {
+        output.textContent = "❌ No history found.";
+      }
+    } catch (err) {
+      document.getElementById(`result-${user.wallet}`).textContent = "❌ Error: " + err.message;
+    }
+  }
+</script>
+
+</body>
+</html>
