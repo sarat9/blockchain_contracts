@@ -1,5 +1,5 @@
 # blockchain_contracts
-A Repo where we build public blockchain smart contracts with Solidity framework.
+A Repo where we build public blockchain smart contracts with the Solidity framework.
 
 
 
@@ -13,7 +13,7 @@ A Repo where we build public blockchain smart contracts with Solidity framework.
 
 Smart Contracts within Repo:
 
-### AerospaceSupplyChain - Blockchain-based Component Traceability
+## AerospaceSupplyChain - Blockchain-based Component Traceability
 AerospaceSupplyChain is a smart contract system built on Ethereum to manage and track the lifecycle of aerospace components in a secure, transparent, and tamper-proof manner using blockchain. It simulates the supply chain involving Boeing (owner), Manufacturers, Labs, and Installers.
 
 Built with Solidity, Node.js, and a sleek HTML frontend
@@ -23,6 +23,19 @@ Built with Solidity, Node.js, and a sleek HTML frontend
 - Payments: Automated payments to installers and manufacturers after successful actions
 - Interactive Demo Portal: UI to simulate each role and their permitted actions
 - Real-time Event Listeners: Backend listeners to capture status updates
+- Single Security - Roles and validations are implemented in the contract, and no need to worry about how the other orgs are implementing their security.
+
+
+
+Sample Demonstration of operations from multiple orgs along their wallet on one single smart contract.
+<img width="1533" alt="Screenshot 2025-04-04 at 9 06 09 PM" src="https://github.com/user-attachments/assets/55b2e0cb-7f81-4bcc-8dc7-2cce6a094a9b" />
+
+Backend events are emitted, and payment is made automatically by the smart contract.
+![image](https://github.com/user-attachments/assets/36c44634-da46-4802-87e6-320ae39817b3)
+
+Security checked with the smart contract itself. Orgs don't have to trust their own  and other orgs' database and application security.
+<img width="1642" alt="image" src="https://github.com/user-attachments/assets/1f85e181-4e0d-41d8-b0af-f80b99e216bd" />
+
 
 
 ## Why Blockchain & Smart Contracts?
@@ -44,4 +57,17 @@ Smart contracts are programs deployed on blockchain that automatically execute a
 - No Blind Trust: You don't need to trust the other party, softwares or their database—the contract ensures fairness.
 - Transparent Rules: Everyone can see and verify the logic.
 - Secure by Design: Built-in cryptographic guarantees make it extremely hard to hack or forge.
+
+
+
+
+
+##
+##
+
+
+<a href="https://www.buymeacoffee.com/sarat" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
+[![GitHub followers](https://img.shields.io/github/followers/sarat9.svg?label=Follow%20@sarat9&style=social)](https://github.com/sarat9/)
+
 
